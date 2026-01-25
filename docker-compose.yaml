@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  backend:
+    container_name: ecart-backend
+    build:
+      context: ./ecartsystem
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./database.db:/database.db   
+      
+    develop:
+      watch:
+        - action: sync
+          path: ./ecartsystem
+          target: /app
+
+        - action: rebuild
+          path: ./ecartsystem/requirements.txt
+
+
+  frontend:
+    container_name: react-dev
+    build:
+      context: ./REACT/my-app
+    command: npm run dev -- --host
+    ports:
+      - "5173:5173"
+
+    develop:
+      watch:
+        - action: sync
+          path: ./REACT/my-app
+          target: /my-app
+
+        - action: rebuild
+          path: ./REACT/my-app/package.json

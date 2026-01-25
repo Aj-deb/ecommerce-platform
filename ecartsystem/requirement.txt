@@ -1,0 +1,8 @@
+fastapi
+fastapi-mail
+sqlalchemy
+typing
+uvicorn
+pwdlib[argon2]
+python-jose[cryptography]
+pyjwt
