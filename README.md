@@ -1,2 +1,2 @@
 # ecommerce-platform
-scalable platform for ecommerce currently under development but adding things step by step
+A scalable ecommerce platform built with React, FastAPI, PostgreSQL, Redis and RabbitMQ featuring cart, order management and payment integration.
