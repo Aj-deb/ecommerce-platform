@@ -1,15 +1,12 @@
 FROM node:20
 
-WORKDIR /my-app
+WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package*.json ./
 RUN npm install
 
 COPY . .
 
-
-# Vite dev server port
 EXPOSE 5173
 
-# Run Vite using CMD
 CMD ["npm", "run", "dev", "--", "--host"]

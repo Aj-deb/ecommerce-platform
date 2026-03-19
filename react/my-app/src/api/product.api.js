@@ -1,8 +1,9 @@
 import api from "./axios"
 
-const products = async(data) =>{
+const fetchProducts = async(params) =>{
     try{
-        const response = await api.post("/Products",data)
+        console.log("PARAMS:",params)
+        const response = await api.get("/products/items",{params})
         return response
     }
     catch(err){
@@ -10,9 +11,9 @@ const products = async(data) =>{
         throw err;
     }
 }
-const specificProducts = async(id,data) =>{
+export const specificProducts = async(data) =>{
     try{
-        const response = await api.post(`/Products/${id}`,data)
+        const response = await api.post(`/products/${data.id}`,data)
         return response
     }
     catch(err){
@@ -20,4 +21,4 @@ const specificProducts = async(id,data) =>{
         throw err;
     }
 }
-export default Products
+export default fetchProducts

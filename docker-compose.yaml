@@ -1,39 +1,72 @@
 version: "3.9"
 
 services:
+  db:
+    image: postgres:15
+    container_name: ecart-db
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   backend:
     container_name: ecart-backend
     build:
       context: ./ecartsystem
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     ports:
       - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
     volumes:
-      - ./database.db:/database.db   
-      
-    develop:
-      watch:
-        - action: sync
-          path: ./ecartsystem
-          target: /app
-
-        - action: rebuild
-          path: ./ecartsystem/requirements.txt
-
-
+      - ./ecartsystem:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    
   frontend:
     container_name: react-dev
     build:
       context: ./REACT/my-app
-    command: npm run dev -- --host
+    working_dir: /app
+
+    volumes:
+      - ./REACT/my-app:/app
+      - /app/node_modules
+
     ports:
       - "5173:5173"
 
-    develop:
-      watch:
-        - action: sync
-          path: ./REACT/my-app
-          target: /my-app
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
 
-        - action: rebuild
-          path: ./REACT/my-app/package.json
+
+  redis:
+        image: redis:7
+        container_name: redis
+        ports:
+          - "6379:6379"
+        volumes:
+          - redis-data:/data
+        command: redis-server --appendonly yes
+        restart: always
+
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  redis-data:
+  rabbitmq_data:
+  postgres_data:

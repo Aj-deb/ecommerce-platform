@@ -7,15 +7,20 @@ import { StrictMode } from "react";
 import { AuthProvider } from "./Context/AuthContext";
 import Login from "./pages/login";
 import "./index.css";
+import {QueryClient,QueryClientProvider} from '@tanstack/react-query'
 
+const queryClient = new QueryClient()
 const root = ReactDOM.createRoot(
   document.getElementById("root")
 );
 // const queryClient = QueryClient();
 root.render(
     <StrictMode>
-        <AuthProvider>
+    <QueryClientProvider client = {queryClient}>
+          <AuthProvider>
             <App/>
         </AuthProvider>
+    </QueryClientProvider>
+      
     </StrictMode>
 );

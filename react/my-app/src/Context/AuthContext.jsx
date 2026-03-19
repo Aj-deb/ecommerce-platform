@@ -7,15 +7,15 @@ import {useNavigate,Navigate}  from "react-router-dom";
 const AuthContext = createContext()//factory =>bluepirnt
 export const AuthProvider=({children})=>{
     const [user,setUser] =useState({})
-    function Validation(error){
+    const Validation=(error)=>{
         console.log(error)
         const fieldErrors = {}
             if(error.response?.data?.detail){
                 error.response.data.detail.forEach(err=>{
                 fieldErrors[err.loc[1]] = err.msg
             })
-            return fieldErrors
         }
+        return fieldErrors
     }
     useEffect(()=>{
         const data = localStorage.getItem("token")

@@ -6,3 +6,6 @@ uvicorn
 pwdlib[argon2]
 python-jose[cryptography]
 pyjwt
+aio-pika
+psycopg2-binary
+alembic
