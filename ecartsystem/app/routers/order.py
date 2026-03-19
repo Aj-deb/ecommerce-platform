@@ -8,41 +8,78 @@ from app.schema.order_schema import OrderCreate,OrderResponse,OrdersResponse,Ord
 from app.schema.CancelOrderResponse import CancelOrderResponse
 from sqlalchemy.orm import Session, joinedload
 
-
 router= APIRouter(prefix="/orders")
 # mera cartitems ko order me daalega orderitems 
-@router.post("/create")
-def orderplaced(db=Depends(get_db),current_user=Depends(get_current_user)):
-    #copy data formr cartitems to orderitems
-    cart = db.query(Cart).filter(Cart.user_id == current_user.id).first()
-    if cart is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Cart is Empty")
-    cartitems =db.query(Cartitems).filter(Cartitems.cart_id == cart.id).all()
+@router.post("/create/{cart_id}")
+def orderplaced(
+    cart_id:int,
+    db=Depends(get_db),
+    current_user=Depends(get_current_user)
+):
 
-    if cartitems is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Cartitems are Empty")
-    order = Order(user_id =current_user.id ,status = OrderStatus.PROCESSING)
-    db.add(order)
-    db.flush() # generate a order id if something went wwrong
-    # no argument by flush
-    for item in cartitems:
-        orderitems = Orderitems(
-            price= item.price ,
-            quantity=item.quantity,
-            product_id = item.product_id,
-            order_id = order.id
+    cart = db.query(Cart).filter(
+        Cart.id == cart_id,
+        Cart.user_id == current_user.id
+    ).first()
+
+    if not cart:
+        raise HTTPException(
+            status_code=404,
+            detail="Cart not found"
         )
-        db.add(orderitems)
-        db.flush()
-    # print(status)
-    db.commit()
+
+    cartitems = db.query(Cartitems).filter(
+        Cartitems.cart_id == cart_id
+    ).all()
+
+    if not cartitems:
+        raise HTTPException(
+            status_code=404,
+            detail="Cart is empty"
+        )
+
+    total = 0
+
+    for item in cartitems:
+        total += item.product.price * item.quantity
+
+    order = Order(
+        user_id=current_user.id,
+        status=OrderStatus.PROCESSING,
+        total_amount=total
+    )
+
+    db.add(order)
+    db.flush()   # generate order.id
+
+    for item in cartitems:
+
+        orderitem = Orderitems(
+            price=item.product.price,
+            quantity=item.quantity,
+            product_id=item.product_id,
+            order_id=order.id
+        )
+
+        db.add(orderitem)
+
+    # delete cartitems FIRST
+    db.query(Cartitems).filter(
+        Cartitems.cart_id == cart_id
+    ).delete()
+
+    # then delete cart
     db.delete(cart)
+
+    db.commit()
+
     db.refresh(order)
-    
-    return {"success":"True",
-        "Msg":"Order has been confirmed"    
-        }
-   
+
+    return {
+        "success": True,
+        "order_id": order.id,
+        "message": "Order created successfully"
+    }
 @router.put("/cancel/{orderid}",response_model=CancelOrderResponse)
 def update_status(orderid:int ,db = Depends(get_db),current_user=Depends(get_current_user)):
     order_exist = db.query(Order).filter(Order.id == orderid,Order.user_id == current_user.id).first()
@@ -70,15 +107,12 @@ def get_orders(db = Depends(get_db),current_user=Depends(get_current_user)):
         "status":item.status,
     }for item in orders]
     
-
-
 @router.get("/{order_id}", response_model=OrderResponse)
 def get_order(
     order_id: int,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
-
     order = (
         db.query(Order)
         .options(

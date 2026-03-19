@@ -1,7 +1,7 @@
 import api from "./axios";
-const Orderplaced = async() =>{
+const Orderplaced = async(id) =>{
     try{
-        const response = await api.post("/orders/create")
+        const response = await api.post(`/orders/create/${id}`)
         return response
     }
     catch(err){

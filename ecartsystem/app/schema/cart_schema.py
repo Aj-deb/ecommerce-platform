@@ -21,4 +21,5 @@ class CartDeleteReturn(BaseModel):
     quantity:int
     
 class CartResponse(BaseModel):
-  items:list[CartItemResponse]
+    cart_id:int
+    items:list[CartItemResponse]

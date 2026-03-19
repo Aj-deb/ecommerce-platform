@@ -32,4 +32,15 @@ export const decreased = async(id) =>{
         throw err;
     }
 }
+
+export const increased = async(id) =>{
+    try{
+        const response = await api.put(`/carts/increase/${id}`)
+        return response
+    }
+    catch(err){
+        console.log(err);
+        throw err;
+    }
+}
 export default fetchCart

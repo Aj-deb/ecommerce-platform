@@ -10,4 +10,3 @@ class Inventory(Base):
     
     product:Mapped["Products"] = relationship(back_populates="inventory")
 
-

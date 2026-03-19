@@ -1,5 +1,9 @@
 import { Link } from "react-router-dom"
+import { useQuery, useMutation } from "@tanstack/react-query"
+import useAuth from "../Context/AuthContext"
+
 export default function Navbar() {
+    const {user} = useAuth()
     return (
         <>
             <nav className="  w-full bg-[#F6F3FB] border-b">
@@ -33,10 +37,11 @@ export default function Navbar() {
                         <li className="hover:text-purple-600 cursor-pointer">
                            <Link to="/OrderPage">My Orders</Link>
                         </li>
+                        <li><Link to="/Cart">My Cart</Link></li>
                         <a href="#">
                             <img src="" alt="" />
 
-                            John Doe
+                            {user["sub"]}
                         </a>
                     </div>
                 </ul>

@@ -4,22 +4,33 @@ import Orderplaced from "../api/order.api";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import fetchCart from "../api/cart.api";
-import { decreased } from "../api/cart.api";
+import { decreased,increased } from "../api/cart.api";
 import { useQuery, useMutation } from "@tanstack/react-query"
-
+import {useState} from "react"
+import Button from "../components/button";
 const Cart = () => {
     const navigate = useNavigate()
-
     const { data, refetch, isLoading, error } = useQuery({
         queryKey: ["cartitems"],
         queryFn: fetchCart,
-        staleTime:0,
-        gcTime:0
     })
-    // const {data1,isLoading1,error1}  = useQuery({
-    //         queryKey:["increase"],
-    //         queryFn:fetchCart
-    // })
+    const increaseItem = useMutation({
+
+        mutationFn: (product_id) => {
+            return increased(product_id)
+        },
+
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["cartitems"]
+            });
+
+            queryClient.refetchQueries({
+                queryKey: ["cartitems"]
+            });
+            refetch();
+        }
+    })
     const decreaseItem = useMutation({
 
         mutationFn: (product_id) => {
@@ -36,8 +47,6 @@ const Cart = () => {
             });
             refetch();
         }
-        
-
     })
     console.log(data);
 
@@ -95,7 +104,7 @@ const Cart = () => {
                                         </div>
                                     </div>
                                     <div className="flex ml-8 bg-indigo-50  rounded-md w-20 h-8 ">
-                                        <button onClick={() => { }} className="w-8 h-full flex items-center justify-center">+</button>
+                                        <button onClick={() => {increaseItem.mutate(item.product.id) }} className="w-8 h-full flex items-center justify-center">+</button>
                                         <p className=" flex items-center justify-center w-8 h-full">{item.quantity}</p>
                                         <button onClick={() => { decreaseItem.mutate(item.product.id) }} className=" w-8 h-full flex items-center justify-center">-</button>
                                     </div>
@@ -108,28 +117,20 @@ const Cart = () => {
                 <div className="min-w-1/2 lg:w-full bg-white rounded-md px-2 mt-4 border-b-1 ">
                     <div className="flex flex-col  p-4 font-medium">
                         <div className="divide-y  border-b border-white  text-[16px] lg:text-[22px] pb-2">
-                            Subtotal (item):{
-                                
+                            Subtotal ({data?.data?.items.length || 0}) : {
+                                data?.data?.items.reduce((sum,item) =>
+                                sum  + item.quantity * item.product.price,0
+                                ).toFixed(2) || 0 
                             }
                         </div>
                         <div className="flex flex-col mt-2">
-                            <button onClick={handleShipping} className="bg-[#9333EA] rounded-md py-2 focus:to-blue-400 transition text-white ">Proceed to Buy</button>
+                            { <Button onClick={handleShipping} disabled = {data?.data?.items?.length === 0}>
+                            Proceed to Buy
+                            </Button>}
                         </div>
                     </div>
                 </div>
             </div>
-
-
-
-            {/* <div className="grid grid-rows-1 bg-blue-700">
-                   <li>items</li>
-                     <div className="bg-red-500 flex  h-32 items-center ">
-                        <div className="bg-blue-500 ">
-                            items
-                        </div>
-                     </div>
-                   </div> */}
-
 
         </>
     )

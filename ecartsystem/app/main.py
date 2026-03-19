@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.models import Address
 from dotenv import load_dotenv
 from app.seeds.category_seed import seed_categories
+from app.seeds.inventory_seed import seed_inventory
 load_dotenv()
 
 app = FastAPI()
@@ -35,6 +36,7 @@ def startup():
     create_on_startup(db)
     seed_categories(db)
     seed_products(db)
+    seed_inventory(db)
     
     
 app.include_router(users.router)

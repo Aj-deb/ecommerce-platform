@@ -5,20 +5,45 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Fields from "../components/input";
 import Button from "../components/button";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery ,useMutation} from "@tanstack/react-query";
 import Address from "../components/address";
+import fetchCart from "../api/cart.api";
+import OrderPlaced from "../components/orderplaced";
+import Orderplaced from "../api/order.api";
+// import {addAddress} from "../api/shipping.api";
+
 const Shipping = () => {
     const [editaddress, setEdit] = useState(true)
     const { data, isLoading, error } = useQuery({
         queryKey: ["address"],
         queryFn: fetchAddress,
     })
-    const selectedAddress = data?.Info?.find(addr=>addr.is_default === true) || data?.Info[0]
+    
+    const { data:data1, isLoading:isloading1, error:error1 } = useQuery({
+        queryKey: ["cart"],
+        queryFn: fetchCart,
+        
+    })
+    
+    const orderCreate = useMutation({
+        mutationFn : (id)=>{
+            console.log(id);
+            // <Navigate path = "OrderPlaced" element="<OrderPlaced/>"/>
+            return Orderplaced(id)
+
+        }
+    })
+    const total = (data1?.data?.items || [])
+                            .reduce((sum, item) =>
+                                sum + item.quantity * item.product.price, 0
+            ).toFixed(2)
+    console.log(data1?.data?.items);
+    const selectedAddress = data?.Info?.find(addr => addr.is_default === true) || data?.Info[0]
     function handleEdit() {
         console.log("hello i am here");
         setEdit(!editaddress)
     }
-    console.log("the ashippin gpart",data);
+    console.log("the ashippin gpart", data);
     return (
         <>
             <Navbar />
@@ -33,15 +58,20 @@ const Shipping = () => {
                                 <p className="text-sm  ">Hno6</p>
                                 <p className="text-sm  ">StreetNO</p>
                                 <p className="text-sm  ">StreetNO</p> */}
-                                {editaddress?
-                                    <div className=" min-h-auto" key={selectedAddress?.id}>
+                                
+                                {editaddress ?
+                                   error?.response?.status == 404 ? 
+                                   <Button >
+                                        Add New Address
+                                   </Button> :
+                                   <div className=" min-h-auto" key={selectedAddress?.id}>
                                         <p className="text-sm font-medium text-gray-700">{selectedAddress?.house_no}</p>
                                         <p className="text-sm font-medium text-gray-700">Street No.{selectedAddress?.street_no}</p>
                                         <p className="text-sm font-medium text-gray-700 ">{selectedAddress?.location},{selectedAddress?.landmark}</p>
                                         <p className="text-sm font-medium text-gray-700">{selectedAddress?.city},{selectedAddress?.state}</p>
                                     </div>
                                     :
-                                    <Address data={data} setEdit={setEdit}/>
+                                    <Address data={data} setEdit={setEdit} />
                                 }
                             </div>
                             <button onClick={handleEdit} className="flex items-start ">Change the address</button>
@@ -50,13 +80,21 @@ const Shipping = () => {
                         <div class="w-full divide-y border-b bg-white rounded-sm p-4 flex flex-col gap-2 ">
                             <h1 className="text-lg font-semibold">Order Summary</h1>
                             <div className="flex flex-col gap-1">
-                                <p className="text-md font-semibold ">Subtotal</p>
-                                <p className="text-sm">items:</p>
-                                <p className="text-sm">Delivery:</p>
+                                <p className="text-md font-semibold ">Subtotal :
+                                    {   
+                                        (data1?.data?.items || [])
+                                            .reduce((sum, item) =>
+                                                sum + item.quantity * item.product.price, 0
+                                            )
+                                            .toFixed(2)
+                                    }
+                                </p>
+                                <p className="text-sm">items: {data1?.data?.items.length} </p>
+                                <p className="text-sm">Delivery: 40</p>
                             </div>
                             <div className="w-full  bg-white rounded-sm ">
-                                <p className="text-lg font-semibold">Total:</p>
-                                <Button className="min-w-full text-lg font-semibold">Make payment</Button>
+                                <p className="text-lg font-semibold">Total: {Number(total) + 40}</p>
+                                <Button onClick={()=>orderCreate.mutate(data1?.data?.cart_id)} className="min-w-full text-lg font-semibold">Make payment</Button>
                             </div>
                         </div>
 

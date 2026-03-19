@@ -32,7 +32,7 @@ async def info_getter(data:AddressCreate ,db=Depends(get_db),current_user=Depend
         db.commit()
         db.refresh(addressDetail)  
         return {
-            "msg":"succesfully  created second address of user"
+            "msg":"succesfully created second address of user"
         }
     return {
             "msg":"Your address is already registered"
