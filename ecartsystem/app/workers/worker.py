@@ -2,7 +2,7 @@ import asyncio
 import json
 import aio_pika
 
-RABBITMQ_URL = "amqp://user:password@rabbitmq:5672/"
+from app.core.config import RABBITMQ_URL
 
 async def main():
     print("Waiting for msg")
