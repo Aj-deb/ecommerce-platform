@@ -1,7 +1,9 @@
-# app/services/rabbitmq_client.py
-
 import json
 import pika
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class RabbitMQClient:
@@ -11,11 +13,17 @@ class RabbitMQClient:
         self.channel = None
 
     def connect(self):
-        self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host="rabbitmq", port=5672)
-        )
+        rabbitmq_url = os.getenv("RABBITMQ_URL")
+
+        params = pika.URLParameters(rabbitmq_url)
+
+        self.connection = pika.BlockingConnection(params)
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.queue_name, durable=True)
+
+        self.channel.queue_declare(
+            queue=self.queue_name,
+            durable=True
+        )
 
     def publish(self, message: dict):
         if not self.channel:
@@ -25,7 +33,9 @@ class RabbitMQClient:
             exchange="",
             routing_key=self.queue_name,
             body=json.dumps(message),
-            properties=pika.BasicProperties(delivery_mode=2),
+            properties=pika.BasicProperties(
+                delivery_mode=2
+            ),
         )
 
     def close(self):
