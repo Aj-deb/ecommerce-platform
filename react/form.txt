@@ -1,0 +1,109 @@
+import Showuser from "./pages/sowuser"
+import { useEffect } from "react";
+import Button from "./pages/button"
+
+// submitting... 2 sec baad we have to show form submiited when submit click karge
+const App = ()=> {
+  // const [name,setName] = useState("")
+  // const [age,setAge ] = useState(0)
+  
+  const [show,setShow] = useState(false)
+  const [issubmitting ,setSubmit] = useState(false) //true =>false value
+  const [form,setForm] = useState({
+    name:"",
+    email:"",
+    password:"",
+    role: "",  
+  }) 
+  useEffect(()=>{
+    if (!issubmitting ) return //false =>true
+    //side effect karnae ke kaam me atta hai 
+    //api , counter,async code nhi , ek bar mount = Didmount =
+    console.log("submitting..");
+    const id = setTimeout(() => {
+    setSubmit(false)
+    console.log("done..");
+    },2000)
+    return () =>clearTimeout(id)
+  },[issubmitting])
+  
+  const [errors,setErrors] = useState({})
+  // email : invalid
+  const  validate = () =>{
+    const newErrors = {}
+    if (!form.name.trim()){
+      newErrors.name = 'field is required'
+    }
+    if(!form.email.trim()){
+      newErrors.email = 'field is required'
+    }
+    else{
+      newErrors.email = "Invalid email"
+    }
+    if(form.password.length < 8){
+        newErrors.password = "password must be of 8 or more characters"
+    }
+    if (!form.role.trim()){
+      newErrors.role = 'field is required'
+    }
+    return newErrors
+  }
+  //form kya object 
+  const handleChange = (e) => {
+    const {name,value} = e.target;
+    setForm(prev =>(
+      {  
+        ...prev,
+        [name] : value
+      })
+  )
+};
+
+  // const name = e.target.name
+  // const value = e.target.value
+  // const name = e.target.name
+  // // button ->loading toggle
+  // // is loading true ur page is loading
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setSubmit(true)
+    const errorValidation = validate(); 
+    if(Object.keys(errorValidation).length > 0){
+      setErrors(errorValidation)  
+      return 
+    }
+    console.log( `your form has been submited ${name}` );
+    setShow(!show)
+  }
+    
+    return(
+      <>
+        <h1>Form</h1>
+        <form onSubmit = {handleSubmit}>
+        <p>Name</p>
+        <input value  = {form.name} onChange = {handleChange} name="name" placeholder="enter name"/>
+        <p>{errors.name}</p>
+        <p>email</p>
+        <input  onChange ={handleChange} name="email"  placeholder="enter email" />
+        <p>{errors.email}</p>
+
+        <p>password</p>
+        <input   onChange ={handleChange} name="password"  placeholder="enter password" />
+        <p>{errors.password}</p>
+
+        <p>role</p>
+        <input onChange ={handleChange} name="role"  placeholder="enter role" />
+        <p>{errors.role}</p>
+
+        <div ><button  disabled ={issubmitting} type="submit">
+          {issubmitting ? "Submitting..." : "Submit" }
+        </button>  </div>
+        
+        </form>
+        { show && <Showuser  name={form.name} password = {form.password} email ={form.email} role = {form.role} /> }    
+      </>
+    )
+return<>
+  <Button onclick = {onclick}/>
+</>
+    
