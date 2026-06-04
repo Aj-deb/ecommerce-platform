@@ -2,7 +2,7 @@ import axios from "axios";
 // const token = localStorage.getItem("token")
 
 const api = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: "https://ecommerce-platform-2mn1.onrender.com",
   headers: { 
     "Content-Type": "application/json"
   }
