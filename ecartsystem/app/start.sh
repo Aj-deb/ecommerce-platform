@@ -1,6 +1,7 @@
 #!/bin/sh
 
 echo "Running database migrations..."
+alembic revision --autogenerate -m "initial schema"
 alembic upgrade head
 
 echo "Starting FastAPI..."
