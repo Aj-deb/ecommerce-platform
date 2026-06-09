@@ -2,7 +2,6 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-
 def send_email(to: str, subject: str, body: str):
     try:
         sender_email = "saj06224@gmail.com"

@@ -21,107 +21,64 @@ import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Login />} />
-        <Route path="/auth" element={<Multiform />} />
-        <Route path="/register" element={<Register />} />
+   <BrowserRouter>
+    <Routes>
+    <Route path="/login" element={<Login />} />
+    <Route path="/auth" element={<Multiform />} />
+    <Route path="/register" element={<Register />} />
+    <Route path="/" element={<Dashboard />} />
+    <Route path="/Products" element={<Products />} />
+    <Route path="/Cart" element={<Cart />} />
+    <Route path="/Shipping" element={<Shipping />} />
+    <Route path="/product/:id" element={<ProductDetail />} />
+    <Route
+      path="/Order"
+      element={
+        <ProtectedRoute>
+          <Order />
+        </ProtectedRoute>
+      }
+    />
 
-        {/* Protected Routes */}
-        <Route
-          path="/Dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+    <Route
+      path="/OrderPage"
+      element={
+        <ProtectedRoute>
+          <Orderpage />
+        </ProtectedRoute>
+      }
+    />
 
-        <Route
-          path="/Products"
-          element={
-            <ProtectedRoute>
-              <Products />
-            </ProtectedRoute>
-          }
-        />
+    <Route
+      path="/SpecifiedOrder/:id"
+      element={
+        <ProtectedRoute>
+          <SpecifiedOrder />
+        </ProtectedRoute>
+      }
+    />
 
-        <Route
-          path="/Cart"
-          element={
-            <ProtectedRoute>
-              <Cart />
-            </ProtectedRoute>
-          }
-        />
+    <Route
+      path="/OrderConfirmationPage/:id"
+      element={
+        <ProtectedRoute>
+          <OrderConfirmationPage />
+        </ProtectedRoute>
+      }
+    />
 
-        <Route
-          path="/Shipping"
-          element={
-            <ProtectedRoute>
-              <Shipping />
-            </ProtectedRoute>
-          }
-        />
+    <Route path="/admin/login" element={<AdminLogin />} />
+    <Route
+      path="/admin"
+      element={
+        <AdminProtectedRoute>
+          <AdminPanel />
+        </AdminProtectedRoute>
+      }
+    />
 
-        <Route
-          path="/Order"
-          element={
-            <ProtectedRoute>
-              <Order />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/OrderPage"
-          element={
-            <ProtectedRoute>
-              <Orderpage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/SpecifiedOrder/:id"
-          element={
-            <ProtectedRoute>
-              <SpecifiedOrder />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/product/:id"
-          element={
-            <ProtectedRoute>
-              <ProductDetail />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/OrderConfirmationPage/:id"
-          element={
-            <ProtectedRoute>
-              <OrderConfirmationPage />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Admin Routes */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route
-          path="/admin"
-          element={
-            <AdminProtectedRoute>
-              <AdminPanel />
-            </AdminProtectedRoute>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+  </Routes>
+</BrowserRouter>
   );
 };
 

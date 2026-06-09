@@ -6,7 +6,7 @@ services:
     container_name: ecart-db
     restart: always
     env_file:
-      - .env
+      - ecartsystem/app/.env.local
     ports:
       - "5432:5432"
     volumes:
@@ -23,7 +23,7 @@ services:
       - redis
       - rabbitmq
     env_file:
-      - .env
+      - ecartsystem/app/.env.local
     volumes:
       - ./ecartsystem:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
@@ -68,7 +68,7 @@ services:
       - rabbitmq
       - redis
     env_file:
-      - .env
+      - ecartsystem/app/.env.local
     volumes:
       - ./ecartsystem:/app
     command: python app/services/otp_email_consumer.py

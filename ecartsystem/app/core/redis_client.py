@@ -2,7 +2,7 @@ import redis
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(".env.local")
 
 REDIS_URL = os.getenv("REDIS_URL")
 
