@@ -47,23 +47,34 @@ Do not share it with anyone.
 def consume():
     print("Starting OTP Email Consumer...")
 
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host="rabbitmq", port=5672)
-    )
+    rabbitmq_url = os.getenv("RABBITMQ_URL")
+
+    if not rabbitmq_url:
+        raise Exception("RABBITMQ_URL not found")
+
+    params = pika.URLParameters(rabbitmq_url)
+
+    print("Connecting to RabbitMQ...")
+    connection = pika.BlockingConnection(params)
+    print("Connected successfully!")
 
     channel = connection.channel()
 
-    channel.queue_declare(queue=QUEUE_NAME, durable=True)
+    channel.queue_declare(
+        queue=QUEUE_NAME,
+        durable=True
+    )
+
     channel.basic_qos(prefetch_count=1)
 
     channel.basic_consume(
         queue=QUEUE_NAME,
-        on_message_callback=callback
+        on_message_callback=callback,
+        auto_ack=False
     )
 
     print("Waiting for OTP email messages...")
     channel.start_consuming()
-
 
 if __name__ == "__main__":
     consume()
