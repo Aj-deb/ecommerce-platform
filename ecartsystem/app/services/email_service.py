@@ -15,8 +15,7 @@ def send_email(to: str, subject: str, body: str):
         msg.attach(MIMEText(body, "plain"))
 
         print("Connecting to SMTP...")
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.starttls()
+        server = smtplib.SMTP("smtp.gmail.com", 465)
 
         print("Logging into Gmail...")
         server.login(sender_email, sender_password)
