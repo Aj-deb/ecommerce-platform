@@ -11,6 +11,9 @@ from dotenv import load_dotenv
 from app.seeds.category_seed import seed_categories
 from app.seeds.inventory_seed import seed_inventory
 from app.api import otp
+import threading
+from app.services.otp_email_consumer import consume
+
 load_dotenv()
 
 app = FastAPI()
@@ -29,6 +32,19 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
+
+@app.on_event("startup")
+async def startup_event():
+    print("Starting RabbitMQ Consumer...")
+
+    consumer_thread = threading.Thread(
+        target=consume,
+        daemon=True
+    )
+
+    consumer_thread.start()
+
+    print("RabbitMQ Consumer Started")
 @app.on_event("startup")
 def startup():
     db=Session(bind=engine,autoflush = False)
