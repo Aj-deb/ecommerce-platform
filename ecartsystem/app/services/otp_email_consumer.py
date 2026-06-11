@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-
+QUEUE_NAME = otp_email_queue
 RABBITMQ_URL = os.getenv("RABBITMQ_URL")
 
 
