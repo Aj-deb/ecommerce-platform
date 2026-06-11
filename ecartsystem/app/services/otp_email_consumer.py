@@ -2,7 +2,7 @@
 
 import json
 import pika
-from app.email_service import send_email
+from app.services.email_service import send_email
 
 
 QUEUE_NAME = "otp_email_queue"
