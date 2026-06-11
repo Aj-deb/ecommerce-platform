@@ -3,9 +3,12 @@
 import json
 import pika
 from app.services.email_service import send_email
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
-QUEUE_NAME = "otp_email_queue"
+rabbitmq_url = os.getenv("RABBITMQ_URL")
 
 
 def callback(ch, method, properties, body):
