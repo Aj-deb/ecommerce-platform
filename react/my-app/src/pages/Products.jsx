@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import fetchDetail from "../api/productdetail";
 import { AddToCart } from "../api/cart.api";
 import { Heart, ShoppingCart, SlidersHorizontal, Star, Truck } from "lucide-react";
+import getGuestCartId from "../utilis/guestCart";
 
 const Products = () => {
     const queryClient = useQueryClient();
@@ -12,14 +13,13 @@ const Products = () => {
     const [limit] = useState(10);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const guest_cart_id = localStorage.getItem("guest_cart_id")
     const q = (searchParams.get("q") || "").trim();
-
     const { data, isLoading, error } = useQuery({
         queryKey: ["products", { limit, page, q }],
         queryFn: ({ queryKey: [, params] }) => fetchProducts(params),
         refetchOnWindowFocus: true,
     });
-
     const products = data?.data || [];
 
     const prefetchProduct = async (id) => {
@@ -28,7 +28,7 @@ const Products = () => {
             queryFn: () => fetchDetail(id),
         });
     };
-
+    
     const addCartMutation = useMutation({
         mutationFn: AddToCart,
         onSuccess: () => {
@@ -36,9 +36,16 @@ const Products = () => {
         },
     });
 
-    const handleAddToCart = (event, productId) => {
+    const handleAddToCart =async (event, productId,uuid) => {
         event.stopPropagation();
-        addCartMutation.mutate({ product_id: productId });
+        console.log("cart add hogi bhenkelode");
+        addCartMutation.mutate(
+            { 
+                product_id: productId,
+                guest_cart_id : guest_cart_id,
+                quantity: 1
+             }
+        );
     };
 
     if (isLoading) {
@@ -127,7 +134,7 @@ const Products = () => {
                                 </div>
                                 <button
                                     type="button"
-                                    onClick={(event) => handleAddToCart(event, prod.id)}
+                                    onClick={(event) => handleAddToCart(event, prod.id,guest_cart_id)}
                                     disabled={addCartMutation.isPending}
                                     className="inline-flex h-11 w-11 items-center justify-center rounded-md bg-violet-600 text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:bg-violet-300"
                                     aria-label={`Add ${prod.name} to cart`}

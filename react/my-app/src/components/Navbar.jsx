@@ -9,6 +9,8 @@ import {
   UserRound,
   LogOut,
 } from "lucide-react";
+import Modal from "./Modal";
+import getGuestCartId from "../utilis/guestCart";
 
 export default function Navbar() {
   const { user, setUser } = useAuth();
@@ -17,7 +19,8 @@ export default function Navbar() {
   const [searchValue, setSearchValue] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const userTypedRef = useRef(false);
-
+  const [open,setOpen] = useState(false)
+  
   const username = user?.sub || user?.name || "Account";
 
   const limitToThreeWords = useMemo(() => {
@@ -53,9 +56,21 @@ export default function Navbar() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    getGuestCartId()
     setUser(null);
     navigate("/");
   };
+  const setModalOpen=() => {
+    if (!localStorage.getItem("token")){
+      setOpen(true)
+    }
+    else{
+      navigate("/OrderPage")
+    }
+  }
+  const setModalCLose =()=>{
+    setOpen(false)
+  }
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -104,14 +119,15 @@ export default function Navbar() {
             <ShoppingBag size={17} />
             Shop
           </Link>
-
-          <Link
-            to="/OrderPage"
+          
+         {<div
             className="inline-flex items-center gap-2 rounded-md px-3 py-2 transition hover:bg-violet-50 hover:text-violet-700"
           >
-            <Package size={17} />
-            Orders
-          </Link>
+            <Package size={17}/>
+              <button onClick={setModalOpen}>Orders</button>
+              {open && <Modal onClick= {setModalCLose}/>}
+          </div>
+         }
 
           {isAdmin ? (
             <Link

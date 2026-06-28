@@ -1,19 +1,19 @@
+import { data } from "react-router-dom";
 import api from "./axios"
 
-const fetchCart = async() =>{
+const fetchCart = async(guest_cart_id) =>{
     try{
-        const response = await api.get("/carts/Viewcart")
-        return response
+        const response = await api.get(`/carts/display/${guest_cart_id}`)
+        return response.data
     }
     catch(err){
-        console.log(err);
         throw err;
     }
 }
 
 export const AddToCart = async(data) =>{
     try{
-        const response = await api.post(`/carts/Addtocart`,data)
+        const response = await api.post(`/carts/add`,data)
         return response
     }
     catch(err){
@@ -22,9 +22,9 @@ export const AddToCart = async(data) =>{
     }
 }
 
-export const decreased = async(id) =>{
+export const CartUpdation = async(data) =>{
     try{
-        const response = await api.put(`/carts/decrease/${id}`)
+        const response = await api.put("/carts/update",data)
         return response
     }
     catch(err){
@@ -32,10 +32,19 @@ export const decreased = async(id) =>{
         throw err;
     }
 }
-
-export const increased = async(id) =>{
+export const mergeCart = async(guest_cart_id) =>{
     try{
-        const response = await api.put(`/carts/increase/${id}`)
+        const response = await api.post(`/carts/merge/${guest_cart_id}`)
+        return response
+    }
+    catch(err){
+        console.log(err);
+        throw err;
+    }
+}
+export const Deleteitem = async(guest_cart_id) =>{
+    try{
+        const response = await api.delete(`/carts/merge/${guest_cart_id}`)
         return response
     }
     catch(err){

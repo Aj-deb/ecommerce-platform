@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Depends
+from fastapi import APIRouter,Depends,HTTPException,status
 from app.core.redis_client import redis_client
 from app.schema.otp_schema import EmailOtp, Otp, OtpReturn
 import random
@@ -18,13 +18,10 @@ def otp(email:EmailOtp):
 @app.post("/verify",response_model=OtpReturn)
 def verify_otp(otp:Otp):
     saved_otp = redis_client.get(f"otp:{otp.email}")
-    if saved_otp == otp.otp:
+    if saved_otp  == otp.otp:
         return {
             "success":True,
             "message":"otp verified"
         }
-    return {
-        "success":False,
-        "message":"Not valid"
-    }
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="Invalid OTP")
     

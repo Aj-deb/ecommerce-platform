@@ -9,11 +9,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Address from "../components/address";
 import fetchCart from "../api/cart.api";
 import Orderplaced from "../api/order.api";
+import useAuth from "../Context/AuthContext";
 
 const Shipping = () => {
   const [editaddress, setEdit] = useState(true);
   const [showAddressModal, setShowAddressModal] = useState(false);
-
+  const {isAuthenticated} =useAuth()
   const [formData, setFormData] = useState({
     first_name: "",
     second_name: "",
@@ -97,7 +98,12 @@ const Shipping = () => {
       address_type: formData.address_type.toLowerCase(),
     });
   };
-
+  const handlePlaceOrder=(data)=>{
+    if (!isAuthenticated){
+        navigate("/login")
+    }
+    orderCreate.mutate(data)
+  }
   return (
     <>
       <Navbar />
@@ -258,7 +264,7 @@ const Shipping = () => {
             </div>
 
             <Button
-              onClick={() => orderCreate.mutate(data1?.data?.cart_id)}
+              onClick={()=>handlePlaceOrder(data1?.data?.cart_id)}
               disabled={cartItems.length === 0}
               className="w-full text-lg font-semibold disabled:opacity-50"
             >

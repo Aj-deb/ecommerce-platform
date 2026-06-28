@@ -82,8 +82,7 @@ const Register = ({ next, formdata, setFormdata }) => {
           <p className="text-red-500 text-sm">{errors.password}</p>
 
           <p className="mt-4">Confirm Password</p>
-          <Fields
-            type="password"
+          <Fields type="password"
             name="confirmpassword"
             placeholder="Confirm the password"
             onChange={(e) =>
@@ -108,7 +107,7 @@ const Register = ({ next, formdata, setFormdata }) => {
 
           <p className="text-sm font-semibold mt-4 flex justify-center">
             Already a user ?
-            <Link to="/" className="text-blue-500 px-1">
+            <Link to="/login" className="text-blue-500 px-1">
               Login
             </Link>
           </p>

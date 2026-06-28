@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "./pages/login";
@@ -18,8 +18,12 @@ import AdminPanel from "./pages/AdminPanel";
 
 import ProtectedRoute from "./components/Protectedapi";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import getGuestCartId from "./utilis/guestCart";
 
 const App = () => {
+  useEffect(()=>{
+    getGuestCartId()
+  },[])
   return (
    <BrowserRouter>
     <Routes>
@@ -29,8 +33,12 @@ const App = () => {
     <Route path="/" element={<Dashboard />} />
     <Route path="/Products" element={<Products />} />
     <Route path="/Cart" element={<Cart />} />
-    <Route path="/Shipping" element={<Shipping />} />
     <Route path="/product/:id" element={<ProductDetail />} />
+    <Route path="/Shipping" element={
+      <ProtectedRoute>
+        <Shipping />
+      </ProtectedRoute>
+   } />
     <Route
       path="/Order"
       element={
@@ -39,7 +47,7 @@ const App = () => {
         </ProtectedRoute>
       }
     />
-
+    
     <Route
       path="/OrderPage"
       element={

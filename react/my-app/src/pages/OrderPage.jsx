@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 const Orderpage = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
-
+  
   useEffect(() => {
     const handleOrder = async () => {
       try {

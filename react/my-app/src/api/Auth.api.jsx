@@ -10,6 +10,23 @@ const loginUser = async(data) =>{
         throw err;
     }
 }
+export const verifyUser = async () => {
+  console.log("verify user called");
+  const token = localStorage.getItem("token");
+
+  try{
+    const response = api.get("/users/me",{
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  })
+    return response
+  }
+  catch(err){
+    throw err;
+  }
+}
+
 export const createUser = async(data) =>{
     try{
         const response = await api.post("/users/create",data)
