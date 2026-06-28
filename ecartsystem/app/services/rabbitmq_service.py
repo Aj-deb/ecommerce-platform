@@ -1,4 +1,3 @@
-# app/services/rabbitmq_service.py
 
 from app.services.rabbitmq_client import RabbitMQClient
 

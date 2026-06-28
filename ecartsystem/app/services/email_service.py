@@ -1,7 +1,6 @@
 import os
 import requests
 
-
 def send_email(to: str, subject: str, body: str):
     api_key = os.getenv("RESEND_API_KEY")
 

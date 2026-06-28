@@ -8,16 +8,16 @@ import { AuthProvider } from "./Context/AuthContext";
 import Login from "./pages/login";
 import "./index.css";
 import {QueryClient,QueryClientProvider} from '@tanstack/react-query'
-
+import {Toaster} from "sonner"
 const queryClient = new QueryClient()
 const root = ReactDOM.createRoot(
   document.getElementById("root")
 );
-// const queryClient = QueryClient();
 root.render(
     <StrictMode>
     <QueryClientProvider client = {queryClient}>
           <AuthProvider>
+            <Toaster position = "top-right" richColors/>
             <App/>
         </AuthProvider>
     </QueryClientProvider>

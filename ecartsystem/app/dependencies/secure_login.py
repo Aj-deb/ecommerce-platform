@@ -7,10 +7,7 @@ from app.models.roles_model import Role_permission
 from app.models.user_model import User
 from jose import JWTError
 from app.core.db import get_db
-
-SECRET_KEY = "AJSIGNH1"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30000
+from app.core.config import ALGORITHM,SECRET_KEY,ACCESS_TOKEN_EXPIRE_MINUTES
 
 password_hash = PasswordHash.recommended()
 
@@ -22,10 +19,12 @@ def hashed_password(password):
 
 def access_token(data:dict):
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(ACCESS_TOKEN_EXPIRE_MINUTES)
+    
+    expire = datetime.utcnow() + timedelta(minutes=int(ACCESS_TOKEN_EXPIRE_MINUTES))
+    
     to_encode.update({"exp":expire})
     
-    jwt_token = jwt.encode(to_encode,SECRET_KEY,algorithm=ALGORITHM)
+    jwt_token = jwt.encode(to_encode, SECRET_KEY,algorithm=ALGORITHM)
     return jwt_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")

@@ -1,100 +1,32 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import fetchCart, { decreased, increased } from "../api/cart.api";
+import fetchCart from "../api/cart.api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Button from "../components/button";
-
+import getGuestCartId from "../utilis/guestCart";
+import useAuth from "../Context/AuthContext";
+import { useRef } from "react"
+import useCartUpdation from "../hooks/cart/useUpdationCart"
+  
 const Cart = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [updatingId, setUpdatingId] = useState(null);
+  const guestCartId = getGuestCartId()
+  const {user,isAuthenticated} = useAuth()
+  const [newQty,setNewQty] = useState(null)
+  const updateCart = useCartUpdation()
+  let timer = useRef(null)
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["cartitems"],
-    queryFn: fetchCart,
+    queryKey: ["cartitems",guestCartId],
+    queryFn: ()=>fetchCart(guestCartId),
   });
-
-  const cartItems = data?.data?.items || [];
-
+ console.log(isAuthenticated);
+  const cartItems = data?.data || []
   const increaseItem = useMutation({
     mutationFn: (product_id) => increased(product_id),
-
-    onMutate: async (product_id) => {
-      setUpdatingId(product_id);
-
-      await queryClient.cancelQueries({ queryKey: ["cartitems"] });
-
-      const previousCart = queryClient.getQueryData(["cartitems"]);
-
-      queryClient.setQueryData(["cartitems"], (old) => {
-        if (!old?.data?.items) return old;
-
-        return {
-          ...old,
-          data: {
-            ...old.data,
-            items: old.data.items.map((item) =>
-              item.product.id === product_id
-                ? { ...item, quantity: item.quantity + 1 }
-                : item
-            ),
-          },
-        };
-      });
-
-      return { previousCart };
-    },
-
-    onError: (_err, _product_id, context) => {
-      queryClient.setQueryData(["cartitems"], context.previousCart);
-    },
-
-    onSettled: () => {
-      setUpdatingId(null);
-      queryClient.invalidateQueries({ queryKey: ["cartitems"] });
-    },
-  });
-
-  const decreaseItem = useMutation({
-    mutationFn: (product_id) => decreased(product_id),
-
-    onMutate: async (product_id) => {
-      setUpdatingId(product_id);
-
-      await queryClient.cancelQueries({ queryKey: ["cartitems"] });
-
-      const previousCart = queryClient.getQueryData(["cartitems"]);
-
-      queryClient.setQueryData(["cartitems"], (old) => {
-        if (!old?.data?.items) return old;
-
-        return {
-          ...old,
-          data: {
-            ...old.data,
-            items: old.data.items
-              .map((item) =>
-                item.product.id === product_id
-                  ? { ...item, quantity: item.quantity - 1 }
-                  : item
-              )
-              .filter((item) => item.quantity > 0),
-          },
-        };
-      });
-
-      return { previousCart };
-    },
-
-    onError: (_err, _product_id, context) => {
-      queryClient.setQueryData(["cartitems"], context.previousCart);
-    },
-
-    onSettled: () => {
-      setUpdatingId(null);
-      queryClient.invalidateQueries({ queryKey: ["cartitems"] });
-    },
   });
 
   const handleShipping = () => {
@@ -120,11 +52,43 @@ const Cart = () => {
     );
   }
 
+  const guest_cart_id = localStorage.getItem("guest_cart_id")
+  const handlequantitychange =(product_id,newQty)=>{
+      queryClient.setQueryData(
+        ["cartitems", guestCartId],
+        (old) => {
+            if (!old) return old
+            if (newQty < 0){
+                removeCartItem.mutate({
+                guest_cart_id,
+                product_id,
+            });
+            return;
+            }
+            return {
+                ...old,
+                data: old.data.map((item) =>
+                    item.product_id === product_id? { ...item, quantity: newQty }: item
+                  
+              )
+            }
+        }
+    )
+      setNewQty(newQty)
+      clearTimeout(timer.current)
+  
+      timer.current = setTimeout(()=>{
+          updateCart.mutate({
+              guest_cart_id,
+              product_id,
+              quantity : newQty
+          })
+      },1000)
+  }
   const total = cartItems.reduce(
-    (sum, item) => sum + item.quantity * Number(item.product.price),
+    (sum, item) => sum + item.quantity * Number(item.price),
     0
   );
-
   return (
     <>
       <Navbar />
@@ -148,20 +112,20 @@ const Cart = () => {
               ) : (
                 cartItems.map((item) => (
                   <div
-                    key={item.product.id}
+                    key={item.id}
                     className="grid grid-cols-[1fr_120px] py-4 items-center"
                   >
                     <div className="flex gap-4">
                       <img
-                        src={item.product.url}
+                        src={item.url}
                         className="w-24 h-24 object-contain bg-gray-100 rounded-lg"
-                        alt={item.product.name}
+                        alt={item.name}
                       />
 
                       <div className="flex m-4 flex-col">
-                        <p className="font-medium">{item.product.name}</p>
+                        <p className="font-medium">{item.name}</p>
                         <p className="text-indigo-600 font-semibold">
-                          ${Number(item.product.price).toFixed(2)}
+                          ${Number(item.price).toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -169,9 +133,9 @@ const Cart = () => {
                     <div className="flex justify-end">
                       <div className="flex items-center border rounded-lg overflow-hidden">
                         <button
-                          onClick={() => decreaseItem.mutate(item.product.id)}
+                          onClick={() => handlequantitychange(item.product_id,item.quantity - 1)}
                           className="px-3 py-1 hover:bg-gray-100 disabled:opacity-50"
-                          disabled={updatingId === item.product.id}
+                          
                         >
                           -
                         </button>
@@ -179,9 +143,8 @@ const Cart = () => {
                         <span className="px-3">{item.quantity}</span>
 
                         <button
-                          onClick={() => increaseItem.mutate(item.product.id)}
+                          onClick={() => handlequantitychange(item.product_id,item.quantity + 1)}
                           className="px-3 py-1 hover:bg-gray-100 disabled:opacity-50"
-                          disabled={updatingId === item.product.id}
                         >
                           +
                         </button>
@@ -209,10 +172,11 @@ const Cart = () => {
 
             <Button
               onClick={handleShipping}
-              disabled={cartItems.length === 0}
+              
+              disabled={cartItems.length === 0 }
               className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Proceed to Buy
+             {isAuthenticated ?"Proceed to Buy":"Login to Proceed"}
             </Button>
           </div>
         </div>

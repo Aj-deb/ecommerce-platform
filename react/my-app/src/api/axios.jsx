@@ -1,8 +1,8 @@
 import axios from "axios";
 // const token = localStorage.getItem("token")
-
+const url = import.meta.env.VITE_API_URL
 const api = axios.create({
-  baseURL: "https://ecommerce-platform-9ihz.onrender.com",
+  baseURL: `${url}`,
   headers: { 
     "Content-Type": "application/json"
   }

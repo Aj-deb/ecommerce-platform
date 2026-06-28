@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import useSendOtp from "../hooks/sendotp";
 import useCreateUser from "../hooks/createUser";
+import { toast } from "sonner";
 
 const Verify = ({ formdata }) => {
     const [otp, setOtp] = useState(["", "", "", ""])
@@ -18,11 +19,20 @@ const Verify = ({ formdata }) => {
     const creatingUser = useCreateUser()
 
 async function handleVerify(otp) {
-    const res = await VerifyOtp(otp, formdata.email)
-    console.log(res.data.success);
-    if (res?.data.success == true) {
-        creatingUser.mutate(formdata)
-        navigate("/dashboard")
+    try{
+        const res = await VerifyOtp(otp, formdata.email)
+        if (res?.status == 200) {
+            creatingUser.mutate(formdata,
+                {
+                    onSuccess:()=>{
+                        navigate("/")
+                    }
+                }
+            )
+        }
+    }
+    catch(error){
+        toast.error(error.response?.data?.detail || "Something went wrong") ;
     }
 }
 async function handleResend() {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "./pages/login";
@@ -18,110 +18,75 @@ import AdminPanel from "./pages/AdminPanel";
 
 import ProtectedRoute from "./components/Protectedapi";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import getGuestCartId from "./utilis/guestCart";
 
 const App = () => {
+  useEffect(()=>{
+    getGuestCartId()
+  },[])
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Login />} />
-        <Route path="/auth" element={<Multiform />} />
-        <Route path="/register" element={<Register />} />
+   <BrowserRouter>
+    <Routes>
+    <Route path="/login" element={<Login />} />
+    <Route path="/auth" element={<Multiform />} />
+    <Route path="/register" element={<Register />} />
+    <Route path="/" element={<Dashboard />} />
+    <Route path="/Products" element={<Products />} />
+    <Route path="/Cart" element={<Cart />} />
+    <Route path="/product/:id" element={<ProductDetail />} />
+    <Route path="/Shipping" element={
+      <ProtectedRoute>
+        <Shipping />
+      </ProtectedRoute>
+   } />
+    <Route
+      path="/Order"
+      element={
+        <ProtectedRoute>
+          <Order />
+        </ProtectedRoute>
+      }
+    />
+    
+    <Route
+      path="/OrderPage"
+      element={
+        <ProtectedRoute>
+          <Orderpage />
+        </ProtectedRoute>
+      }
+    />
 
-        {/* Protected Routes */}
-        <Route
-          path="/Dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+    <Route
+      path="/SpecifiedOrder/:id"
+      element={
+        <ProtectedRoute>
+          <SpecifiedOrder />
+        </ProtectedRoute>
+      }
+    />
 
-        <Route
-          path="/Products"
-          element={
-            <ProtectedRoute>
-              <Products />
-            </ProtectedRoute>
-          }
-        />
+    <Route
+      path="/OrderConfirmationPage/:id"
+      element={
+        <ProtectedRoute>
+          <OrderConfirmationPage />
+        </ProtectedRoute>
+      }
+    />
 
-        <Route
-          path="/Cart"
-          element={
-            <ProtectedRoute>
-              <Cart />
-            </ProtectedRoute>
-          }
-        />
+    <Route path="/admin/login" element={<AdminLogin />} />
+    <Route
+      path="/admin"
+      element={
+        <AdminProtectedRoute>
+          <AdminPanel />
+        </AdminProtectedRoute>
+      }
+    />
 
-        <Route
-          path="/Shipping"
-          element={
-            <ProtectedRoute>
-              <Shipping />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/Order"
-          element={
-            <ProtectedRoute>
-              <Order />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/OrderPage"
-          element={
-            <ProtectedRoute>
-              <Orderpage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/SpecifiedOrder/:id"
-          element={
-            <ProtectedRoute>
-              <SpecifiedOrder />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/product/:id"
-          element={
-            <ProtectedRoute>
-              <ProductDetail />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/OrderConfirmationPage/:id"
-          element={
-            <ProtectedRoute>
-              <OrderConfirmationPage />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Admin Routes */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route
-          path="/admin"
-          element={
-            <AdminProtectedRoute>
-              <AdminPanel />
-            </AdminProtectedRoute>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+  </Routes>
+</BrowserRouter>
   );
 };
 
