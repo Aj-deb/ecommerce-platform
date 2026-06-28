@@ -7,7 +7,9 @@ from email_service import send_email
 
 load_dotenv(".env.local")
 
+load_dotenv()
 QUEUE_NAME = "otp_email_queue"
+RABBITMQ_URL = os.getenv("RABBITMQ_URL")
 
 
 def callback(ch, method, properties, body):
@@ -76,13 +78,13 @@ def consume():
 
     channel.basic_consume(
         queue=QUEUE_NAME,
-        on_message_callback=callback
+        on_message_callback=callback,
+        auto_ack=False
     )
 
     print("Waiting for OTP messages...")
 
     channel.start_consuming()
-
 
 if __name__ == "__main__":
     consume()
